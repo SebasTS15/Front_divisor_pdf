@@ -12,19 +12,28 @@ export class PdfPreviewService {
     return pdf.numPages;
   }
 
-  async renderFirstPage(file: File, canvas: HTMLCanvasElement): Promise<void> {
+  async renderPages(file: File, canvases: HTMLCanvasElement[]): Promise<void>  {
+
     const data = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data }).promise;
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: 1.3 });
-    const context = canvas.getContext('2d');
 
-    if (!context) {
-      return;
+    for (let i = 1; i <= pdf.numPages; i++) {
+
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 2.3 });
+
+        const canvas = canvases[i-1];
+        
+        if(!canvas) continue;
+        
+        const context = canvas.getContext('2d');
+        
+        if (!context) continue;
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvas, viewport }).promise;
     }
-
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvas, canvasContext: context, viewport }).promise;
   }
 }

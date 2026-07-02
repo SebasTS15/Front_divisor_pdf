@@ -2,9 +2,11 @@ import { Component, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { PdfPreviewService } from '../../services/pdf-preview.service';
 import { PdfStateService } from '../../services/pdf-state.service';
+import {MatIconModule} from '@angular/material/icon'
 
 @Component({
   selector: 'app-home-page',
+  imports: [MatIconModule],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css'
 })

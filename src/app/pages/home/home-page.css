@@ -24,6 +24,7 @@
   text-align: center;
   transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
   width: 100%;
+  cursor: pointer;
 }
 
 .drop-zone input {

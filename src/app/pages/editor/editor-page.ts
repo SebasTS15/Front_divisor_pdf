@@ -1,20 +1,23 @@
-import { Component, ElementRef, OnInit, ViewChild, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PdfApiService } from '../../services/pdf-api.service';
 import { PdfPreviewService } from '../../services/pdf-preview.service';
 import { PdfStateService, ResultFileItem } from '../../services/pdf-state.service';
+import { form } from '@angular/forms/signals';
+import {MatIconModule} from '@angular/material/icon'
 
 type OperationMode = 'split' | 'extract';
 
 @Component({
   selector: 'app-editor-page',
-  imports: [FormsModule],
+  standalone: true,
+  imports: [FormsModule, MatIconModule],
   templateUrl: './editor-page.html',
   styleUrl: './editor-page.css'
 })
 export class EditorPage implements OnInit {
-  @ViewChild('previewCanvas') previewCanvas?: ElementRef<HTMLCanvasElement>;
+  @ViewChildren('previewCanvas') previewCanvas!: QueryList<ElementRef<HTMLCanvasElement>>;
 
   private readonly api = inject(PdfApiService);
   private readonly pdfPreview = inject(PdfPreviewService);
@@ -26,9 +29,11 @@ export class EditorPage implements OnInit {
   readonly isSubmitting = signal(false);
   readonly error = signal('');
 
+
   outputName = '';
-  pagesPerPdf = 5;
-  pagesToExtract = '1';
+  pagesPerPdf = 1;
+  pagesToExtract = '';
+  pages: number[] = [];
 
   splitPreview(): number[] {
     const totalPages = this.document()?.totalPages ?? 0;
@@ -43,6 +48,10 @@ export class EditorPage implements OnInit {
       void this.router.navigate(['/']);
       return;
     }
+    this.pages = Array.from(
+    { length: current.totalPages },
+    (_, i) => i + 1
+    );
 
     this.outputName = this.cleanName(current.file.name.replace(/\.pdf$/i, '')) || 'documento';
     queueMicrotask(() => void this.renderPreview());
@@ -101,12 +110,12 @@ export class EditorPage implements OnInit {
 
   private async renderPreview(): Promise<void> {
     const current = this.document();
-    const canvas = this.previewCanvas?.nativeElement;
-    if (!current || !canvas) {
+    if (!current) {
       return;
     }
+    const canvas = this.previewCanvas.toArray().map(m => m.nativeElement);
 
-    await this.pdfPreview.renderFirstPage(current.file, canvas);
+    await this.pdfPreview.renderPages(current.file, canvas);
   }
 
   private async getZipItems(blob: Blob): Promise<ResultFileItem[]> {
@@ -129,5 +138,17 @@ export class EditorPage implements OnInit {
 
   private cleanName(value: string): string {
     return value.trim().replace(/[\\/:*?"<>|]/g, '-');
+  }
+
+  validateNumberPage(event: any){
+    const maxi = this.document()?.totalPages!;
+    if ( this.pagesPerPdf > maxi ) {
+      this.pagesPerPdf = maxi;
+      event.target.value = maxi;
+    }
+    if ( this.pagesPerPdf < 1 && this.pagesPerPdf !== null ) {
+      this.pagesPerPdf = 1;
+      event.target.value = 1;
+    }
   }
 }

@@ -61,24 +61,34 @@
 }
 
 .mode-tabs {
-  border: 1px solid #c9d8ee;
-  border-radius: 4px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  overflow: hidden;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 8px;
+  border: none;
+  width: 100%;
 }
 
 .mode-tabs button {
-  background: #fff;
+  background: transparent;
   border: 0;
-  color: var(--blue-800);
-  font-weight: 800;
-  min-height: 42px;
+  color: #808891;
+  font-weight: 700;
+  font-size: 20px;
+  padding: 0 50px;
+  min-height: auto;
+  border-bottom: 2px solid transparent;
+  text-align: center;
+  transition: color 0.2s ease, border-bottom-color 0.2s ease, transform 0.2s ease;
+  width: 100%;
+  height: 2.5rem;
 }
 
 .mode-tabs button.active {
-  background: var(--blue-900);
-  color: #fff;
+  color: var(--blue-900);
+  border-bottom-color: var(--blue-900);
+  transform: scale(1.05);
 }
 
 .option-block {
@@ -96,7 +106,7 @@
 }
 
 .option-title h3 {
-  font-size: 12px;
+  font-size: 14px;
   margin: 0;
 }
 
