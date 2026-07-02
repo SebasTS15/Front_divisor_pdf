@@ -1,0 +1,55 @@
+.upload-panel {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-height: calc(100vh - 92px);
+  padding: 135px 16px;
+}
+
+.drop-zone {
+  align-items: center;
+  border: 2px dashed #a8acb5;
+  border-radius: 8px;
+  color: #9da1a8;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 22px;
+  justify-content: center;
+  max-height: 340px;
+  min-height: 300px;
+  outline: none;
+  padding: 40px;
+  text-align: center;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease;
+  width: 100%;
+}
+
+.drop-zone input {
+  display: none;
+}
+
+.drop-zone--active,
+.drop-zone:hover {
+  background: #f3f8ff;
+  border-color: var(--blue-700);
+  color: var(--blue-700);
+}
+
+.upload-icon {
+  height: 44px;
+  width: 44px;
+}
+
+@media (max-width: 760px) {
+  .upload-panel {
+    min-height: calc(100vh - 82px);
+    padding: 48px 14px;
+  }
+
+  .drop-zone {
+    min-height: 280px;
+    padding: 24px;
+  }
+}

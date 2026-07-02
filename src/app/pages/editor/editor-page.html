@@ -1,0 +1,102 @@
+<main class="app-shell">
+  <header class="brand">
+    <svg class="brand-icon" viewBox="0 0 36 36" aria-hidden="true">
+      <path d="M29 8 9 18l20 10" fill="none" stroke="currentColor" stroke-width="2" />
+      <circle cx="7" cy="18" r="3" fill="#fff" stroke="currentColor" stroke-width="2" />
+      <circle cx="30" cy="7" r="3" fill="#fff" stroke="currentColor" stroke-width="2" />
+      <circle cx="30" cy="29" r="3" fill="#fff" stroke="currentColor" stroke-width="2" />
+    </svg>
+    <div>
+      <h1 class="brand-title">Division de PDFs</h1>
+      <p class="brand-subtitle">Cargue un archivo PDF y seleccione las paginas a dividir.</p>
+    </div>
+  </header>
+
+  @if (document(); as pdf) {
+    <section class="main-panel editor-panel">
+      <div class="preview-column">
+        <p class="preview-label">
+          <span aria-hidden="true">◎</span>
+          Previsualizando {{ pdf.totalPages }} paginas
+        </p>
+        <div class="pdf-preview">
+          <canvas #previewCanvas></canvas>
+        </div>
+      </div>
+
+      <aside class="options-column">
+        <div class="file-heading">
+          <h2>{{ pdf.file.name }}</h2>
+          <strong>({{ pdf.totalPages }} pag)</strong>
+        </div>
+
+        <div class="mode-tabs" role="tablist" aria-label="Operacion PDF">
+          <button [class.active]="mode() === 'split'" type="button" (click)="setMode('split')">
+            Dividir
+          </button>
+          <button [class.active]="mode() === 'extract'" type="button" (click)="setMode('extract')">
+            Extraer
+          </button>
+        </div>
+
+        @if (mode() === 'split') {
+          <section class="option-block">
+            <div class="option-title">
+              <h3>Paginas a separar por seccion</h3>
+              <span aria-hidden="true">⌃</span>
+            </div>
+            <input
+              class="small-input"
+              min="1"
+              [max]="pdf.totalPages"
+              type="number"
+              [(ngModel)]="pagesPerPdf"
+            />
+            <p class="muted">
+              Se generaran {{ splitPreview().length }} archivos PDF
+            </p>
+            <div class="mini-pdfs" aria-label="Archivos PDF que se generaran">
+              @for (item of splitPreview(); track item) {
+                <span>PDF</span>
+              }
+            </div>
+          </section>
+        } @else {
+          <section class="option-block">
+            <div class="option-title">
+              <h3>Extraer por pagina o rango</h3>
+              <span aria-hidden="true">⌄</span>
+            </div>
+            <div class="field">
+              <label for="pagesToExtract">Paginas a extraer</label>
+              <input
+                id="pagesToExtract"
+                placeholder="Ej. 1, 3-5, 8"
+                type="text"
+                [(ngModel)]="pagesToExtract"
+              />
+            </div>
+          </section>
+        }
+
+        <section class="option-block">
+          <div class="field">
+            <label for="outputName">Nombre del archivo</label>
+            <input id="outputName" placeholder="Ej. Innovacion" type="text" [(ngModel)]="outputName" />
+          </div>
+        </section>
+
+        @if (error()) {
+          <p class="error">{{ error() }}</p>
+        }
+
+        <div class="actions">
+          <button class="secondary-button" type="button" (click)="cancel()">Cancelar</button>
+          <button class="primary-button" type="button" [disabled]="isSubmitting()" (click)="submit()">
+            {{ isSubmitting() ? 'Procesando...' : mode() === 'split' ? 'Dividir PDF' : 'Extraer PDF' }}
+          </button>
+        </div>
+      </aside>
+    </section>
+  }
+</main>

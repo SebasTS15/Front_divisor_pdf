@@ -1,0 +1,142 @@
+:root {
+  --blue-900: #0c3d91;
+  --blue-800: #124ea9;
+  --blue-700: #155fc7;
+  --blue-600: #1f72d2;
+  --blue-100: #e9f2ff;
+  --line: #dce6f4;
+  --text: #18345f;
+  --muted: #7690b5;
+  --panel: #ffffff;
+  --bg: #f7fbff;
+  --danger: #ba2d2d;
+  --shadow: 0 14px 35px rgba(17, 78, 169, 0.16);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Inter, Segoe UI, Arial, sans-serif;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+.app-shell {
+  min-height: 100vh;
+  padding: 20px 22px;
+}
+
+.brand {
+  align-items: center;
+  color: var(--blue-900);
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.brand-icon {
+  height: 34px;
+  width: 34px;
+}
+
+.brand-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin: 0 0 4px;
+}
+
+.brand-subtitle {
+  color: var(--blue-800);
+  font-size: 12px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.main-panel {
+  background: var(--panel);
+  border: 1px solid #e8eef8;
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.primary-button,
+.secondary-button {
+  align-items: center;
+  border-radius: 4px;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 10px;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 22px;
+}
+
+.primary-button {
+  background: var(--blue-900);
+  border: 1px solid var(--blue-900);
+  color: #fff;
+}
+
+.secondary-button {
+  background: #fff;
+  border: 1px solid #b9cbe8;
+  color: var(--blue-800);
+}
+
+.primary-button:disabled,
+.secondary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+}
+
+.field label {
+  color: var(--blue-900);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.field input {
+  border: 1px solid #cfdbea;
+  border-radius: 4px;
+  color: var(--text);
+  min-height: 42px;
+  padding: 0 12px;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.error {
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+@media (max-width: 760px) {
+  .app-shell {
+    padding: 14px;
+  }
+}
