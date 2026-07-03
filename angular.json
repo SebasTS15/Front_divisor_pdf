@@ -51,6 +51,16 @@
               {
                 "glob": "**/*",
                 "input": "public"
+              },
+              {
+                "glob": "pdf.worker.mjs",
+                "input": "./node_modules/pdfjs-dist/build",
+                "output": "assets" 
+              },
+              {
+                "glob": "pdf.sandbox.wasm",
+                "input": "./node_modules/pdfjs-dist/build",
+                "output": "assets" 
               }
             ],
             "styles": [

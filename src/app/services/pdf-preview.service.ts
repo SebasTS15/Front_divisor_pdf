@@ -1,11 +1,9 @@
 import { Injectable } from '@angular/core';
 import * as pdfjsLib from 'pdfjs-dist';
 import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
-import { takeUntil } from 'rxjs';
-import { errorContext } from 'rxjs/internal/util/errorContext';
 
-const workerSrc = new URL('pdfjs-dist/build/pdf.worker.mjs', import.meta.url).toString();
-pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/pdf.worker.mjs';
+(pdfjsLib.GlobalWorkerOptions as any).wasmUrl = '/assets/pdf.sandbox.wasm';
 
 type RenderTask = {
   pageNumber: number
