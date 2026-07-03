@@ -23,7 +23,7 @@
           <mat-icon>remove_red_eye</mat-icon>
           Previsualizando {{ pdf.totalPages }} paginas
         </p>
-        <div class="pdf-preview">
+        <div class="pdf-preview" #previewPanel>
           @for (page of pages; track $index) {
             <canvas #previewCanvas></canvas>
           }
@@ -60,12 +60,13 @@
               (keydown)="['e', 'E', '+', '-', '.'].includes($event.key) ? $event.preventDefault() : null"
             />
             <p class="muted">
-              Se generaran {{ splitPreview().length }} archivos PDF
+              Se generaran {{ splitPreviewTotal() }} archivos PDF
             </p>
             <div class="mini-pdfs" aria-label="Archivos PDF que se generaran">
               @for (item of splitPreview(); track item) {
                 <span>PDF</span>
               }
+
             </div>
           </section>
         } @else {

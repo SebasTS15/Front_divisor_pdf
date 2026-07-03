@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, QueryList, ViewChildren, inject, signal } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { PdfApiService } from '../../services/pdf-api.service';
@@ -6,6 +6,7 @@ import { PdfPreviewService } from '../../services/pdf-preview.service';
 import { PdfStateService, ResultFileItem } from '../../services/pdf-state.service';
 import { form } from '@angular/forms/signals';
 import {MatIconModule} from '@angular/material/icon'
+import { waitForAngularReady } from '@angular/cdk/testing/selenium-webdriver';
 
 type OperationMode = 'split' | 'extract';
 
@@ -16,13 +17,17 @@ type OperationMode = 'split' | 'extract';
   templateUrl: './editor-page.html',
   styleUrl: './editor-page.css'
 })
-export class EditorPage implements OnInit {
+export class EditorPage implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('previewPanel') previewPanel?: ElementRef<HTMLDivElement>;
   @ViewChildren('previewCanvas') previewCanvas!: QueryList<ElementRef<HTMLCanvasElement>>;
 
   private readonly api = inject(PdfApiService);
   private readonly pdfPreview = inject(PdfPreviewService);
   private readonly pdfState = inject(PdfStateService);
   private readonly router = inject(Router);
+
+  private previewObserver?: IntersectionObserver;
+  private renderedPages = new Set<number>();
 
   readonly document = this.pdfState.document;
   readonly mode = signal<OperationMode>('split');
@@ -35,26 +40,44 @@ export class EditorPage implements OnInit {
   pagesToExtract = '';
   pages: number[] = [];
 
+  splitPreviewTotal(): number{
+    const totalPages = this.document()?.totalPages?? 0;
+    const size = Number(this.pagesPerPdf) || 0;
+    const total = size > 0 ? Math.ceil(totalPages / size) : 0;
+    return (total)
+  }
+
   splitPreview(): number[] {
     const totalPages = this.document()?.totalPages ?? 0;
     const size = Number(this.pagesPerPdf) || 0;
     const total = size > 0 ? Math.ceil(totalPages / size) : 0;
+
+    if (total >26){
+        return Array.from({ length: 26 }, (_, index) => index + 1);
+      }
+
     return Array.from({ length: total }, (_, index) => index + 1);
   }
 
   ngOnInit(): void {
     const current = this.document();
+
     if (!current) {
       void this.router.navigate(['/']);
       return;
     }
-    this.pages = Array.from(
-    { length: current.totalPages },
-    (_, i) => i + 1
-    );
 
+    this.pages = Array.from({ length: current.totalPages }, (_, i) => i + 1);
     this.outputName = this.cleanName(current.file.name.replace(/\.pdf$/i, '')) || 'documento';
+  }
+
+  ngAfterViewInit(): void {
+    this.initializePreviewObserver();
     queueMicrotask(() => void this.renderPreview());
+  }
+
+  ngOnDestroy(): void {
+    this.previewObserver?.disconnect();
   }
 
   setMode(mode: OperationMode): void {
@@ -108,14 +131,61 @@ export class EditorPage implements OnInit {
     });
   }
 
-  private async renderPreview(): Promise<void> {
+  
+  private async preparePreview(): Promise<void> {
+    
     const current = this.document();
-    if (!current) {
-      return;
-    }
-    const canvas = this.previewCanvas.toArray().map(m => m.nativeElement);
+    
+    if (!current) return;
+    
+    await this.pdfPreview.loadPdf(current.file);
+  }
 
-    await this.pdfPreview.renderPages(current.file, canvas);
+  private initializePreviewObserver(): void {
+    const root = this.previewPanel?.nativeElement ?? null;
+
+    this.previewObserver = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+
+          const canvas = entry.target as HTMLCanvasElement;
+          const pageNumber = Number(canvas.dataset['pageIndex']);
+
+          if (!pageNumber || this.renderedPages.has(pageNumber)) {
+            continue;
+          }
+
+          this.renderedPages.add(pageNumber);
+          this.pdfPreview.enqueue(pageNumber, canvas);
+          this.previewObserver?.unobserve(canvas);
+        }
+      },
+      {
+        root,
+        rootMargin: '400px',
+        threshold: 0.1
+      }
+    );
+  }
+
+  private enqueuePages(): void {
+    const canvases = this.previewCanvas.toArray().map(c => c.nativeElement);
+
+    canvases.forEach((canvas, index) => {
+      canvas.dataset['pageIndex'] = String(index + 1);
+      if (this.previewObserver) {
+        this.previewObserver.observe(canvas);
+      } else {
+        this.renderedPages.add(index + 1);
+        this.pdfPreview.enqueue(index + 1, canvas);
+      }
+    });
+  }
+
+  private async renderPreview(): Promise<void> {
+    await this.preparePreview();
+    this.enqueuePages();
   }
 
   private async getZipItems(blob: Blob): Promise<ResultFileItem[]> {
