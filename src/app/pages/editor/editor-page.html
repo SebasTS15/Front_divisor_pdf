@@ -18,6 +18,16 @@
 
   @if (document(); as pdf) {
     <section class="main-panel editor-panel">
+      @if (isSubmitting()) {
+        <div class="loading-overlay" role="status" aria-live="polite">
+          <div class="loading-state">
+            <div class="spinner" aria-hidden="true"></div>
+            <p>{{ processingMessage() }}</p>
+            <span>Esto puede tardar unos segundos</span>
+          </div>
+        </div>
+      }
+
       <div class="preview-column">
         <p class="preview-label">
           <mat-icon>remove_red_eye</mat-icon>
@@ -100,7 +110,7 @@
         <div class="actions">
           <button class="secondary-button" type="button" (click)="cancel()">Cancelar</button>
           <button class="primary-button" type="button" [disabled]="isSubmitting()" (click)="submit()">
-            {{ isSubmitting() ? 'Procesando...' : mode() === 'split' ? 'Dividir PDF' : 'Extraer PDF' }}
+            {{ isSubmitting() ? (mode() === 'split' ? 'Dividiendo...' : 'Extrayendo...') : mode() === 'split' ? 'Dividir PDF' : 'Extraer PDF' }}
           </button>
         </div>
       </aside>

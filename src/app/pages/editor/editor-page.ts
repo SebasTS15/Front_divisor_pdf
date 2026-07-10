@@ -34,6 +34,9 @@ export class EditorPage implements OnInit, AfterViewInit, OnDestroy {
   readonly isSubmitting = signal(false);
   readonly error = signal('');
 
+  processingMessage(): string {
+    return this.mode() === 'split' ? 'Dividiendo PDF...' : 'Extrayendo PDF...';
+  }
 
   outputName = '';
   pagesPerPdf = 1;
