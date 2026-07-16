@@ -1,7 +1,7 @@
 import { DecimalPipe } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { PdfStateService } from '../../services/pdf-state.service';
+import { PdfStateService, ResultFileItem } from '../../services/pdf-state.service';
 
 @Component({
   selector: 'app-result-page',
@@ -12,7 +12,7 @@ import { PdfStateService } from '../../services/pdf-state.service';
 export class ResultPage implements OnInit {
   private readonly pdfState = inject(PdfStateService);
   private readonly router = inject(Router);
-
+  readonly visibleItems = signal(8);
   readonly result = this.pdfState.result;
 
   ngOnInit(): void {
@@ -26,4 +26,25 @@ export class ResultPage implements OnInit {
     this.pdfState.clearResult();
     void this.router.navigate(['/']);
   }
+
+  async download(item: ResultFileItem) {
+
+    const blob = await item.file.async("blob");
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = item.name;
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+}
+
+showMore(): void {
+  this.visibleItems.update(value => value + 8);
+}
+
 }

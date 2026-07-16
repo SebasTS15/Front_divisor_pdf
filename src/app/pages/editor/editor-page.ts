@@ -7,8 +7,11 @@ import { PdfStateService, ResultFileItem } from '../../services/pdf-state.servic
 import { form } from '@angular/forms/signals';
 import {MatIconModule} from '@angular/material/icon'
 import { waitForAngularReady } from '@angular/cdk/testing/selenium-webdriver';
+import { file } from 'jszip';
 
 type OperationMode = 'split' | 'extract';
+
+
 
 @Component({
   selector: 'app-editor-page',
@@ -117,6 +120,7 @@ export class EditorPage implements OnInit, AfterViewInit, OnDestroy {
 
     request.subscribe({
       next: async ({ blob, fileName }) => {
+        console.log(blob.size);
         try {
           const type = this.mode() === 'split' ? 'zip' : 'pdf';
           const items = type === 'zip' ? await this.getZipItems(blob) : [];
@@ -192,21 +196,18 @@ export class EditorPage implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async getZipItems(blob: Blob): Promise<ResultFileItem[]> {
-    const JSZip = (await import('jszip')).default;
-    const zip = await JSZip.loadAsync(blob);
-    const files = Object.values(zip.files).filter((file) => !file.dir);
-    const items = await Promise.all(
-      files.map(async (file) => {
-        const itemBlob = await file.async('blob');
-        return {
-          name: file.name,
-          size: itemBlob.size,
-          url: URL.createObjectURL(itemBlob)
-        };
-      })
-    );
 
-    return items;
+    const JSZip = (await import('jszip')).default;
+
+    const zip = await JSZip.loadAsync(blob);
+
+    return Object.values(zip.files)
+        .filter(file => !file.dir)
+        .map(file => ({
+            name: file.name,
+            size: 0,
+            file
+        }));
   }
 
   private cleanName(value: string): string {

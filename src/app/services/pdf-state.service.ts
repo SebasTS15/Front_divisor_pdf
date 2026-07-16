@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import type { JSZipObject } from 'jszip';
 
 export interface PdfDocumentState {
   file: File;
@@ -9,7 +10,7 @@ export interface PdfDocumentState {
 export interface ResultFileItem {
   name: string;
   size: number;
-  url: string;
+  file: JSZipObject;
 }
 
 export interface PdfResultState {
@@ -19,6 +20,8 @@ export interface PdfResultState {
   objectUrl: string;
   items: ResultFileItem[];
 }
+
+
 
 @Injectable({ providedIn: 'root' })
 export class PdfStateService {
@@ -55,7 +58,6 @@ export class PdfStateService {
     const current = this.result();
     if (current) {
       URL.revokeObjectURL(current.objectUrl);
-      current.items.forEach((item) => URL.revokeObjectURL(item.url));
     }
     this.result.set(null);
   }

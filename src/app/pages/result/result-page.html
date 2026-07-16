@@ -38,14 +38,32 @@
       @if (output.type === 'zip') {
         <section class="zip-list">
           <h3>PDFs dentro del ZIP</h3>
-          @for (item of output.items; track item.name) {
+
+          @for (item of output.items.slice(0, visibleItems()); track item.name) {
             <article class="zip-item">
               <div>
                 <strong>{{ item.name }}</strong>
                 <span>{{ item.size / 1024 | number: '1.0-1' }} KB</span>
               </div>
-              <a class="secondary-button" [href]="item.url" [download]="item.name">Descargar PDF</a>
+
+              <button
+                class="secondary-button"
+                type="button"
+                (click)="download(item)">
+                Descargar PDF
+              </button>
             </article>
+          }
+          
+          @if (visibleItems() < output.items.length) {
+            <div class="show-more-container">
+              <button
+                class="secondary-button"
+                type="button"
+                (click)="showMore()">
+                Mostrar más PDFs
+              </button>
+            </div>
           }
         </section>
       }

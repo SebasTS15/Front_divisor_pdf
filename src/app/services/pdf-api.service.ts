@@ -10,6 +10,7 @@ export interface ApiBlobResult {
 @Injectable({ providedIn: 'root' })
 export class PdfApiService {
   private readonly apiUrl = 'http://172.31.150.34:8000/api/pdf_service';
+  //private readonly apiUrl = 'http://10.130.12.62:5031/api/pdf_service';
 
   constructor(private readonly http: HttpClient) {}
 
