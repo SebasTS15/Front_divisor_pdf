@@ -225,4 +225,21 @@ export class EditorPage implements OnInit, AfterViewInit, OnDestroy {
       event.target.value = 1;
     }
   }
+
+  testSpeed(): void {
+  const start = performance.now();
+  this.api.speedTest().subscribe({
+    next: ({ blob }) => {
+      console.log("Tiempo:", (performance.now() - start) / 1000, "s");
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'speed-test.bin';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  });
+
+  }
+
 }

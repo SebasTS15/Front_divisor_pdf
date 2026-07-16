@@ -108,6 +108,7 @@
         }
 
         <div class="actions">
+          <!-- <button (click)="testSpeed()"> Probar velocidad </button> -->
           <button class="secondary-button" type="button" (click)="cancel()">Cancelar</button>
           <button class="primary-button" type="button" [disabled]="isSubmitting()" (click)="submit()">
             {{ isSubmitting() ? (mode() === 'split' ? 'Dividiendo...' : 'Extrayendo...') : mode() === 'split' ? 'Dividir PDF' : 'Extraer PDF' }}

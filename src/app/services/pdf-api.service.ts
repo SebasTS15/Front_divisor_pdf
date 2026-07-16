@@ -9,8 +9,8 @@ export interface ApiBlobResult {
 
 @Injectable({ providedIn: 'root' })
 export class PdfApiService {
-  private readonly apiUrl = 'http://172.31.150.34:8000/api/pdf_service';
-  //private readonly apiUrl = 'http://10.130.12.62:5031/api/pdf_service';
+  //private readonly apiUrl = 'http://172.31.150.34:8000/api/pdf_service'; //URL Local Para pruebas locales
+  private readonly apiUrl = 'http://10.130.12.62:5031/api/pdf_service'; //URL de producción 
 
   constructor(private readonly http: HttpClient) {}
 
@@ -46,4 +46,16 @@ export class PdfApiService {
     const match = contentDisposition?.match(/filename="?([^"]+)"?/i);
     return match?.[1] ?? null;
   }
+  speedTest(): Observable<ApiBlobResult> {
+  return this.http.get(`${this.apiUrl}/test-download`, {
+    observe: 'response',
+    responseType: 'blob'
+  }).pipe(
+    map((response: HttpResponse<Blob>) => ({
+      blob: response.body ?? new Blob(),
+      fileName: 'speed-test.bin'
+    }))
+  );
+  }
+
 }
